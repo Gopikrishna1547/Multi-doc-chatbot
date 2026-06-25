@@ -13,3 +13,15 @@ def load_pdf(filepath: str) -> str:
         text += page.extract_text() or ""
     log.info(f"Extracted text from {len(reader.pages)} pages")
     return text
+
+
+def load_multiple_pdfs(files: list) -> dict:
+    """Extract text from multiple PDF files and return as dictionary."""
+    log.info(f"Loading {len(files)} PDF files")
+    documents = {}
+    for file in files:
+        name = file.name
+        text = load_pdf_from_upload(file)
+        documents[name] = text
+        log.info(f"Loaded: {name}")
+    return documents
