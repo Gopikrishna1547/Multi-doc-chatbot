@@ -40,3 +40,11 @@ def build_vector_store(documents: dict) -> object:
     vector_store = FAISS.from_documents(all_chunks, embeddings)
     log.info(f"Vector store built with {len(all_chunks)} total chunks")
     return vector_store
+
+
+def search_documents(vector_store, query: str, k: int = 4) -> list:
+    """Search vector store and return top k most relevant chunks."""
+    log.info(f"Searching for: {query}")
+    results = vector_store.similarity_search(query, k=k)
+    log.info(f"Found {len(results)} relevant chunks")
+    return results
