@@ -27,3 +27,16 @@ def split_text(text: str, source_name: str) -> list:
     )
     log.info(f"Created {len(chunks)} chunks from {source_name}")
     return chunks
+
+
+def build_vector_store(documents: dict) -> object:
+    """Build FAISS vector store from multiple documents."""
+    log.info(f"Building vector store from {len(documents)} documents")
+    all_chunks = []
+    for name, text in documents.items():
+        chunks = split_text(text, name)
+        all_chunks.extend(chunks)
+    embeddings = get_embeddings()
+    vector_store = FAISS.from_documents(all_chunks, embeddings)
+    log.info(f"Vector store built with {len(all_chunks)} total chunks")
+    return vector_store
