@@ -25,3 +25,14 @@ def load_multiple_pdfs(files: list) -> dict:
         documents[name] = text
         log.info(f"Loaded: {name}")
     return documents
+
+
+def load_pdf_from_upload(uploaded_file) -> str:
+    """Extract text from a Streamlit uploaded file object."""
+    import tempfile, os
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(uploaded_file.read())
+        tmp_path = tmp.name
+    text = load_pdf(tmp_path)
+    os.unlink(tmp_path)
+    return text
