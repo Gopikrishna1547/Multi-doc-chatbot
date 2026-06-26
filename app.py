@@ -116,3 +116,14 @@ def render_chat():
                     error_msg = f"Error generating answer: {e}"
                     st.error(error_msg)
                     log.error(error_msg)
+
+
+def main():
+    """Main entry point for the Streamlit application."""
+    init_session_state()
+    render_sidebar()
+    render_chat()
+
+
+if __name__ == "__main__":
+    main()
