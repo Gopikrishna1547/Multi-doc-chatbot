@@ -16,3 +16,15 @@ st.set_page_config(
     page_icon="AI",
     layout="wide"
 )
+
+
+def init_session_state():
+    """Initialize all Streamlit session state variables."""
+    if "vector_store" not in st.session_state:
+        st.session_state.vector_store = None
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+    if "documents_loaded" not in st.session_state:
+        st.session_state.documents_loaded = False
+    if "document_names" not in st.session_state:
+        st.session_state.document_names = []
