@@ -27,3 +27,17 @@ def build_context(search_results: list) -> tuple:
         for doc in search_results
     ]))
     return context, sources
+
+
+def generate_answer(question: str, context: str) -> str:
+    """Generate answer for a question given a context."""
+    log.info(f"Generating answer for: {question}")
+    try:
+        qa = get_qa_pipeline()
+        result = qa(question=question, context=context[:2000])
+        answer = result.get("answer", "").strip()
+        log.info("Answer generated successfully")
+        return answer if answer else "No answer found in the documents."
+    except Exception as e:
+        log.error(f"Answer generation failed: {e}")
+        return "Could not generate an answer. Please try rephrasing."
