@@ -41,3 +41,18 @@ def generate_answer(question: str, context: str) -> str:
     except Exception as e:
         log.error(f"Answer generation failed: {e}")
         return "Could not generate an answer. Please try rephrasing."
+
+
+def ask_question(vector_store, question: str) -> dict:
+    """Full pipeline: search documents and generate answer."""
+    from src.vector_store import search_documents
+    log.info(f"Processing question: {question}")
+    search_results = search_documents(vector_store, question, k=4)
+    context, sources = build_context(search_results)
+    answer = generate_answer(question, context)
+    return {
+        "question": question,
+        "answer": answer,
+        "sources": sources,
+        "context": context
+    }
