@@ -61,3 +61,58 @@ def render_sidebar():
             st.markdown("**Loaded Documents:**")
             for name in st.session_state.document_names:
                 st.markdown(f"- {name}")
+
+
+def render_chat():
+    """Render the main chat interface."""
+    st.title("Multi-Document Chatbot")
+
+    if not st.session_state.documents_loaded:
+        st.info("Upload PDF documents in the sidebar to get started.")
+        st.markdown("### What you can do:")
+        st.markdown("""
+        - Upload multiple PDF documents at once
+        - Ask questions across all documents
+        - See which document the answer came from
+        - View conversation history
+        """)
+        return
+
+    for message in st.session_state.chat_history:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
+            if message["role"] == "assistant" and "sources" in message:
+                if message["sources"]:
+                    st.caption(f"Sources: {', '.join(message['sources'])}")
+
+    question = st.chat_input("Ask a question about your documents...")
+
+    if question:
+        st.session_state.chat_history.append({
+            "role": "user",
+            "content": question
+        })
+        with st.chat_message("user"):
+            st.write(question)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Searching documents..."):
+                try:
+                    result = ask_question(
+                        st.session_state.vector_store,
+                        question
+                    )
+                    answer = result["answer"]
+                    sources = result["sources"]
+                    st.write(answer)
+                    if sources:
+                        st.caption(f"Sources: {', '.join(sources)}")
+                    st.session_state.chat_history.append({
+                        "role": "assistant",
+                        "content": answer,
+                        "sources": sources
+                    })
+                except Exception as e:
+                    error_msg = f"Error generating answer: {e}"
+                    st.error(error_msg)
+                    log.error(error_msg)
