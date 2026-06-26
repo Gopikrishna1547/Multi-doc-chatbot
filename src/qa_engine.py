@@ -16,3 +16,14 @@ def get_qa_pipeline():
         )
         log.info("QA model loaded successfully")
     return _qa_pipeline
+
+
+def build_context(search_results: list) -> tuple:
+    """Build context string and source list from search results."""
+    log.info("Building context from search results")
+    context = "\n\n".join([doc.page_content for doc in search_results])
+    sources = list(set([
+        doc.metadata.get("source", "Unknown")
+        for doc in search_results
+    ]))
+    return context, sources
