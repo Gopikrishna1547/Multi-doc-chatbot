@@ -127,3 +127,29 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def render_chat_controls():
+    """Render chat history controls in sidebar."""
+    from src.chat_history import save_chat_as_pdf, clear_chat_history, get_chat_summary
+    import streamlit as st
+
+    if st.session_state.chat_history:
+        st.sidebar.divider()
+        summary = get_chat_summary(st.session_state.chat_history)
+        st.sidebar.markdown(f"**Questions asked:** {summary['questions_asked']}")
+
+        if st.sidebar.button("Download Chat as PDF"):
+            with st.spinner("Generating PDF..."):
+                path = save_chat_as_pdf(st.session_state.chat_history)
+                with open(path, "rb") as f:
+                    st.sidebar.download_button(
+                        label="Click to Download",
+                        data=f,
+                        file_name="chat_history.pdf",
+                        mime="application/pdf"
+                    )
+
+        if st.sidebar.button("Clear Chat History"):
+            clear_chat_history(st.session_state)
+            st.rerun()
