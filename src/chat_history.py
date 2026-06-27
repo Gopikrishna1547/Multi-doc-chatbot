@@ -73,3 +73,22 @@ def save_chat_as_pdf(chat_history: list, topic: str = "Chat") -> str:
     doc.build(story)
     log.info(f"Chat history saved to: {filename}")
     return filename
+
+
+def clear_chat_history(session_state) -> None:
+    """Clear chat history from Streamlit session state."""
+    log.info("Clearing chat history")
+    session_state.chat_history = []
+    log.info("Chat history cleared")
+
+
+def get_chat_summary(chat_history: list) -> dict:
+    """Return summary statistics about the chat history."""
+    total = len(chat_history)
+    questions = len([m for m in chat_history if m["role"] == "user"])
+    answers = len([m for m in chat_history if m["role"] == "assistant"])
+    return {
+        "total_messages": total,
+        "questions_asked": questions,
+        "answers_given": answers
+    }
