@@ -1,21 +1,6 @@
 import logging
-from transformers import pipeline
 
 log = logging.getLogger(__name__)
-_qa_pipeline = None
-
-
-def get_qa_pipeline():
-    """Load and return QA pipeline — loaded once and cached."""
-    global _qa_pipeline
-    if _qa_pipeline is None:
-        log.info("Loading QA model...")
-        _qa_pipeline = pipeline(
-            "question-answering",
-            model="deepset/roberta-base-squad2"
-        )
-        log.info("QA model loaded successfully")
-    return _qa_pipeline
 
 
 def build_context(search_results: list) -> tuple:
@@ -30,14 +15,32 @@ def build_context(search_results: list) -> tuple:
 
 
 def generate_answer(question: str, context: str) -> str:
-    """Generate answer for a question given a context."""
-    log.info(f"Generating answer for: {question}")
+    """Find the most relevant sentence from context as the answer."""
+    log.info(f"Finding answer for: {question}")
     try:
-        qa = get_qa_pipeline()
-        result = qa(question=question, context=context[:2000])
-        answer = result.get("answer", "").strip()
-        log.info("Answer generated successfully")
-        return answer if answer else "No answer found in the documents."
+        question_words = set(question.lower().split())
+        sentences = []
+        for chunk in context.split("\n"):
+            chunk = chunk.strip()
+            if len(chunk) > 30:
+                sentences.append(chunk)
+
+        if not sentences:
+            return "No relevant content found in the documents."
+
+        best_sentence = ""
+        best_score = 0
+        for sentence in sentences:
+            sentence_words = set(sentence.lower().split())
+            score = len(question_words & sentence_words)
+            if score > best_score:
+                best_score = score
+                best_sentence = sentence
+
+        if best_sentence:
+            return best_sentence[:500]
+        return sentences[0][:500]
+
     except Exception as e:
         log.error(f"Answer generation failed: {e}")
         return "Could not generate an answer. Please try rephrasing."

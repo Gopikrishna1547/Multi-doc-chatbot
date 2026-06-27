@@ -1,38 +1,45 @@
-import logging
-from pypdf import PdfReader
+import tempfile
+import os
+from PyPDF2 import PdfReader
+from PyPDF2.errors import PdfReadError
 
-log = logging.getLogger(__name__)
 
-
-def load_pdf(filepath: str) -> str:
-    """Extract all text from a single PDF file."""
-    log.info(f"Loading PDF: {filepath}")
-    reader = PdfReader(filepath)
+def load_pdf(file_path: str) -> str:
     text = ""
-    for page in reader.pages:
-        text += page.extract_text() or ""
-    log.info(f"Extracted text from {len(reader.pages)} pages")
-    return text
 
+    try:
+        with open(file_path, "rb") as f:
+            reader = PdfReader(f)
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
 
-def load_multiple_pdfs(files: list) -> dict:
-    """Extract text from multiple PDF files and return as dictionary."""
-    log.info(f"Loading {len(files)} PDF files")
-    documents = {}
-    for file in files:
-        name = file.name
-        text = load_pdf_from_upload(file)
-        documents[name] = text
-        log.info(f"Loaded: {name}")
-    return documents
+        return text
+
+    except PdfReadError:
+        return ""
 
 
 def load_pdf_from_upload(uploaded_file) -> str:
-    """Extract text from a Streamlit uploaded file object."""
-    import tempfile, os
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-        tmp.write(uploaded_file.read())
-        tmp_path = tmp.name
-    text = load_pdf(tmp_path)
-    os.unlink(tmp_path)
-    return text
+    tmp_path = None
+
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(uploaded_file.read())
+            tmp_path = tmp.name
+
+        return load_pdf(tmp_path)
+
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
+def load_multiple_pdfs(uploaded_files) -> dict:
+    pdf_texts = {}
+
+    for file in uploaded_files:
+        pdf_texts[file.name] = load_pdf_from_upload(file)
+
+    return pdf_texts
