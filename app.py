@@ -2,8 +2,7 @@ import logging
 import streamlit as st
 from src.pdf_loader import load_multiple_pdfs
 from src.vector_store import build_vector_store
-from src.qa_engine import ask_question
-
+from src.qa_engine import ask_question, summarize_documents, generate_important_qa
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -25,11 +24,12 @@ def init_session_state():
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
     if "documents_loaded" not in st.session_state:
-        st.session_state.documents_loaded = False
-    if "document_names" not in st.session_state:
-        st.session_state.document_names = []
+        st.session_state.documents_loaded = False    
+if "document_summary" not in st.session_state:
+    st.session_state.document_summary = ""
 
-
+if "auto_qa" not in st.session_state:
+    st.session_state.auto_qa = []
 def render_sidebar():
     """Render the sidebar with PDF upload and document info."""
     with st.sidebar:
