@@ -1,24 +1,24 @@
-# 📄 Multi-Document Chatbot
+#  Multi-Document Chatbot
 
 A Retrieval-Augmented Generation (RAG) chatbot built with **Python**, **Streamlit**, **LangChain**, and **FAISS**. This application allows users to upload multiple PDF documents and ask questions based only on the uploaded content.
 
 ---
 
-# 🚀 Features
+#  Features
 
-* 📚 Upload up to **5 PDF documents**
-* 🔍 Semantic search across multiple PDFs
-* 🤖 AI-powered question answering
-* ⚡ Fast document retrieval using FAISS
-* 📄 Displays the source document
-* 💬 Maintains chat history
-* 🧹 Clear chat history
-* 📥 Download chat history
-* ✅ Unit tested with Pytest
+*  Upload up to **5 PDF documents**
+*  Semantic search across multiple PDFs
+*  AI-powered question answering
+*  Fast document retrieval using FAISS
+*  Displays the source document
+*  Maintains chat history
+*  Clear chat history
+*  Download chat history
+*  Unit tested with Pytest
 
 ---
 
-# 🏗️ Architecture
+#  Architecture
 
 ```text
 User Uploads PDFs
@@ -47,7 +47,7 @@ Answer + Source Document
 
 ---
 
-# 🛠️ Tech Stack
+#  Tech Stack
 
 | Technology            | Purpose                        |
 | --------------------- | ------------------------------ |
@@ -61,7 +61,7 @@ Answer + Source Document
 
 ---
 
-# 📂 Project Structure
+#  Project Structure
 
 ```text
 multi-doc-chatbot/
@@ -85,9 +85,9 @@ multi-doc-chatbot/
 
 ---
 
-# ⚙️ Setup
+#  Setup
 
-## 1️⃣ Clone the Repository
+## 1 Clone the Repository
 
 ```bash
 git clone https://github.com/Gopikrishna1547/Multi-doc-chatbot.git
@@ -97,7 +97,7 @@ cd Multi-doc-chatbot
 
 ---
 
-## 2️⃣ Create a Virtual Environment (Recommended)
+##  2 Create a Virtual Environment (Recommended)
 
 ### macOS / Linux
 
@@ -117,7 +117,7 @@ venv\Scripts\activate
 
 ---
 
-## 3️⃣ Install Dependencies
+## 3 Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -125,7 +125,7 @@ pip install -r requirements.txt
 
 ---
 
-## 4️⃣ Run the Application
+## 4 Run the Application
 
 ```bash
 streamlit run app.py
@@ -139,7 +139,7 @@ http://localhost:8501
 
 ---
 
-## 5️⃣ Using the Chatbot
+## 5 Using the Chatbot
 
 1. Upload one or more PDF documents.
 2. Click **Process Documents**.
@@ -150,7 +150,7 @@ http://localhost:8501
 
 ---
 
-# 🧪 Running Tests
+#  Running Tests
 
 Run all unit tests:
 
@@ -168,17 +168,7 @@ Expected output:
 
 ---
 
-# 💡 Example Questions
-
-* What is the population of India?
-* Which iPhone model was released in 2020?
-* Summarize this document.
-* Which document contains information about demographic transition?
-* Compare the information from two uploaded PDFs.
-
----
-
-# 🔮 Future Improvements
+#  Future Improvements
 
 * Support DOCX and TXT files
 * Page-level citations
@@ -188,26 +178,3 @@ Expected output:
 * Support additional LLM providers
 
 ---
-
-# 🌿 Git Workflow
-
-This project follows a simple Git workflow:
-
-* **main** → Stable production-ready code
-* **dev** → Active development and feature integration
-
-All new features are developed and tested in the **dev** branch before being merged into **main**.
-
----
-
-# 👨‍💻 Author
-
-**Gopikrishna Bojedla**
-
-* GitHub: https://github.com/Gopikrishna1547
-* LinkedIn: *(Add your LinkedIn profile URL here)*
-
----
-
-## ⭐ If you found this project useful, consider giving it a star on GitHub!
-
