@@ -52,10 +52,13 @@ def render_sidebar():
                     st.session_state.documents_loaded = True
                     st.session_state.document_names = list(documents.keys())
                     st.session_state.chat_history = []
+
+                    st.session_state.document_summary = summarize_documents(documents)
+                    st.session_state.auto_qa = generate_important_qa(documents)
+
                     st.success(f"Loaded {len(documents)} documents!")
                 except Exception as e:
                     st.error(f"Error processing documents: {e}")
-
         if st.session_state.documents_loaded:
             st.divider()
             st.markdown("**Loaded Documents:**")
@@ -77,7 +80,15 @@ def render_chat():
         - View conversation history
         """)
         return
+    if st.session_state.document_summary:
+        st.subheader("PDF Summary")
+        st.markdown(st.session_state.document_summary)
 
+    if st.session_state.auto_qa:
+        st.subheader("Important Questions and Answers")
+        for i, item in enumerate(st.session_state.auto_qa, start=1):
+            with st.expander(f"Q{i}: {item['question']}"):
+                st.write(item["answer"])
     for message in st.session_state.chat_history:
         with st.chat_message(message["role"]):
             st.write(message["content"])
