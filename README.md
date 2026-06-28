@@ -1,137 +1,125 @@
-#  Multi-Document Chatbot
+# 📄 Multi-Document AI Assistant
 
-A Retrieval-Augmented Generation (RAG) chatbot built with **Python**, **Streamlit**, **LangChain**, and **FAISS**. This application allows users to upload multiple PDF documents and ask questions based only on the uploaded content.
-
----
-
-#  Features
-
-*  Upload up to **5 PDF documents**
-*  Semantic search across multiple PDFs
-*  AI-powered question answering
-*  Fast document retrieval using FAISS
-*  Displays the source document
-*  Maintains chat history
-*  Clear chat history
-*  Download chat history
-*  Unit tested with Pytest
+A Streamlit-based Retrieval-Augmented Generation (RAG) style chatbot that allows users to upload multiple PDF documents, generate a short summary, review important questions, and ask questions that are answered only from the uploaded PDF content.
 
 ---
 
-#  Architecture
+## 🚀 Features
+
+- 📂 Upload one or more PDF documents
+- 📄 Generate a concise **5-10 point PDF summary**
+- ❓ Generate **document-specific important questions and answers**
+- 💬 Ask custom questions about uploaded PDFs
+- 🎯 Return only **one best answer** from the most relevant document content
+- 🚫 Show a clear fallback message when an answer is not available in the PDFs
+- 📌 Display source PDF name and page number where available
+- 📊 Show document statistics such as PDFs, pages, chunks, and questions asked
+- ✅ Unit tested with Pytest
+
+Fallback message:
 
 ```text
-User Uploads PDFs
-        │
-        ▼
-PDF Text Extraction
-        │
-        ▼
-Text Chunking
-        │
-        ▼
-Sentence Embeddings
-        │
-        ▼
-FAISS Vector Database
-        │
-        ▼
-Similarity Search
-        │
-        ▼
-LangChain QA Engine
-        │
-        ▼
-Answer + Source Document
+I could not find an answer to this question in the uploaded PDF document(s).
 ```
 
 ---
 
-#  Tech Stack
+## 🏗️ Application Workflow
 
-| Technology            | Purpose                        |
-| --------------------- | ------------------------------ |
-| Python                | Programming Language           |
-| Streamlit             | Web Application                |
-| LangChain             | Retrieval-Augmented Generation |
-| FAISS                 | Vector Database                |
-| Sentence Transformers | Text Embeddings                |
-| PyPDF2                | PDF Text Extraction            |
-| Pytest                | Unit Testing                   |
+```text
+User uploads PDFs
+        │
+        ▼
+PDF text extraction with page markers
+        │
+        ▼
+Text chunking with source + page metadata
+        │
+        ▼
+FAISS vector store creation
+        │
+        ├──► Short PDF summary
+        ├──► Important Q&A generation
+        └──► User question answering
+                    │
+                    ▼
+            One best PDF-grounded answer
+```
 
 ---
 
-#  Project Structure
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| Python | Core programming language |
+| Streamlit | Web interface |
+| LangChain Community | Embeddings and FAISS integration |
+| FAISS | Vector similarity search |
+| Sentence Transformers | Text embeddings |
+| PyPDF2 | PDF text extraction |
+| Pytest | Unit testing |
+
+---
+
+## 📂 Project Structure
 
 ```text
-multi-doc-chatbot/
-│
+Multi-doc-chatbot/
+├── app.py
+├── requirements.txt
+├── README.md
+├── conftest.py
 ├── src/
 │   ├── pdf_loader.py
 │   ├── vector_store.py
 │   ├── qa_engine.py
-│   ├── chat_history.py
-│
+│   └── chat_history.py
 ├── tests/
 │   └── test_main.py
-│
-├── docs/
-│
-├── app.py
-├── requirements.txt
-├── README.md
-└── conftest.py
+└── docs/
 ```
 
 ---
 
-#  Setup
+## ⚙️ Setup
 
-## 1 Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Gopikrishna1547/Multi-doc-chatbot.git
-
 cd Multi-doc-chatbot
 ```
 
----
+### 2. Create a virtual environment
 
-##  2 Create a Virtual Environment (Recommended)
-
-### macOS / Linux
+macOS / Linux:
 
 ```bash
 python3 -m venv venv
-
 source venv/bin/activate
 ```
 
-### Windows
+Windows:
 
 ```bash
 python -m venv venv
-
 venv\Scripts\activate
 ```
 
----
-
-## 3 Install Dependencies
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-## 4 Run the Application
+### 4. Run the app
 
 ```bash
 streamlit run app.py
 ```
 
-Open your browser:
+Open the browser at:
 
 ```text
 http://localhost:8501
@@ -139,42 +127,73 @@ http://localhost:8501
 
 ---
 
-## 5 Using the Chatbot
-
-1. Upload one or more PDF documents.
-2. Click **Process Documents**.
-3. Wait for processing to finish.
-4. Ask questions related to the uploaded PDFs.
-5. View the generated answer and source document.
-6. Download or clear the chat history if required.
-
----
-
-#  Running Tests
-
-Run all unit tests:
+## 🧪 Run Tests
 
 ```bash
 python3 -m pytest tests/test_main.py -v
 ```
 
-Expected output:
+Expected result:
 
 ```text
-========================
 7 passed
-========================
 ```
 
 ---
 
-#  Future Improvements
+## 💡 Example Questions
 
-* Support DOCX and TXT files
-* Page-level citations
-* Conversation memory
-* Cloud vector database
-* User authentication
-* Support additional LLM providers
+For a COVID-19 PDF:
+
+- What virus caused COVID-19?
+- How did COVID-19 affect mental health?
+- What does the document say about the Omicron variant?
+- Why is vaccination important according to the document?
+- What public health measures are recommended to reduce COVID-19 spread?
+
+For a population PDF:
+
+- What does the document explain about population growth?
+- How many people are born and die each year worldwide?
+- What is the demographic transition?
+- How does fertility affect population growth?
 
 ---
+
+## 🌿 Git Workflow
+
+Recommended development workflow:
+
+```bash
+git checkout dev
+# make changes
+git add .
+git commit -m "Meaningful commit message"
+git push origin dev
+```
+
+Then create a Pull Request:
+
+```text
+base: main
+compare: dev
+```
+
+---
+
+## 🔮 Future Improvements
+
+- Add support for DOCX and TXT files
+- Add OCR support for scanned PDFs
+- Use an LLM for more natural summaries and answers
+- Add highlighted source text
+- Export summary and generated Q&A to PDF
+- Add user authentication
+
+---
+
+## 👨‍💻 Author
+
+**Gopikrishna Bojedla**
+
+- GitHub: https://github.com/Gopikrishna1547
