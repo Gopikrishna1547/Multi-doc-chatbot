@@ -1,75 +1,39 @@
-# 📄 Multi-Document AI Assistant
+# Multi-Document AI Assistant
 
-A Streamlit-based Retrieval-Augmented Generation (RAG) style chatbot that allows users to upload multiple PDF documents, generate a short summary, review important questions, and ask questions that are answered only from the uploaded PDF content.
+A Streamlit-based PDF assistant that lets users upload multiple PDF documents, generate document-wise summaries, generate document-wise questions, and ask questions that are answered only from the uploaded PDFs.
 
----
+## Features
 
-## 🚀 Features
+- Upload up to 5 PDF documents.
+- Extract readable text from uploaded PDFs.
+- Build a searchable vector index with FAISS.
+- Generate a separate 5-7 line summary for each document.
+- Generate important questions and answers for each document.
+- Answer user questions using only uploaded PDF content.
+- Return source PDF names and page numbers.
+- Show multiple page-based answers when relevant information appears on more than one page.
+- Show a fallback message when the answer is not found in the uploaded PDFs.
+- Display document statistics such as document count, page count, chunk count, and question count.
 
-- 📂 Upload one or more PDF documents
-- 📄 Generate a concise **5-10 point PDF summary**
-- ❓ Generate **document-specific important questions and answers**
-- 💬 Ask custom questions about uploaded PDFs
-- 🎯 Return only **one best answer** from the most relevant document content
-- 🚫 Show a clear fallback message when an answer is not available in the PDFs
-- 📌 Display source PDF name and page number where available
-- 📊 Show document statistics such as PDFs, pages, chunks, and questions asked
-- ✅ Unit tested with Pytest
+## Tech Stack
 
-Fallback message:
-
-```text
-I could not find an answer to this question in the uploaded PDF document(s).
-```
-
----
-
-## 🏗️ Application Workflow
-
-```text
-User uploads PDFs
-        │
-        ▼
-PDF text extraction with page markers
-        │
-        ▼
-Text chunking with source + page metadata
-        │
-        ▼
-FAISS vector store creation
-        │
-        ├──► Short PDF summary
-        ├──► Important Q&A generation
-        └──► User question answering
-                    │
-                    ▼
-            One best PDF-grounded answer
-```
-
----
-
-## 🛠️ Tech Stack
-
-| Technology | Purpose |
-|------------|---------|
-| Python | Core programming language |
+| Tool | Purpose |
+|---|---|
+| Python | Core language |
 | Streamlit | Web interface |
-| LangChain Community | Embeddings and FAISS integration |
-| FAISS | Vector similarity search |
-| Sentence Transformers | Text embeddings |
-| PyPDF2 | PDF text extraction |
+| PyPDF / PyPDF2 | PDF text extraction |
+| LangChain | Document processing and vector workflow |
+| FAISS | Vector search |
+| Hugging Face Sentence Transformers | Embeddings |
 | Pytest | Unit testing |
 
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```text
 Multi-doc-chatbot/
 ├── app.py
 ├── requirements.txt
 ├── README.md
-├── conftest.py
 ├── src/
 │   ├── pdf_loader.py
 │   ├── vector_store.py
@@ -80,120 +44,62 @@ Multi-doc-chatbot/
 └── docs/
 ```
 
----
+## Setup
 
-## ⚙️ Setup
-
-### 1. Clone the repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/Gopikrishna1547/Multi-doc-chatbot.git
 cd Multi-doc-chatbot
 ```
 
-### 2. Create a virtual environment
-
-macOS / Linux:
+Create and activate a virtual environment:
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-Windows:
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-### 3. Install dependencies
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run the app
+Run the app:
 
 ```bash
 streamlit run app.py
 ```
 
-Open the browser at:
+## Usage
 
-```text
-http://localhost:8501
-```
+1. Open the Streamlit app.
+2. Upload up to 5 PDF documents from the sidebar.
+3. Click **Process Documents**.
+4. Review the summary for each document.
+5. Review the generated questions for each document.
+6. Ask your own questions in the chat box.
+7. Check the answer and source page references.
 
----
+## Testing
 
-## 🧪 Run Tests
+Run the test suite:
 
 ```bash
 python3 -m pytest tests/test_main.py -v
 ```
 
-Expected result:
+## Answering Behavior
+
+The assistant searches uploaded PDFs and returns answers only from retrieved PDF content. If matching content appears on multiple pages, the answer is grouped by page. If no strong matching content is found, the assistant returns:
 
 ```text
-7 passed
+I could not find an answer to this question in the uploaded PDF document(s).
 ```
 
----
+## Notes
 
-## 💡 Example Questions
-
-For a COVID-19 PDF:
-
-- What virus caused COVID-19?
-- How did COVID-19 affect mental health?
-- What does the document say about the Omicron variant?
-- Why is vaccination important according to the document?
-- What public health measures are recommended to reduce COVID-19 spread?
-
-For a population PDF:
-
-- What does the document explain about population growth?
-- How many people are born and die each year worldwide?
-- What is the demographic transition?
-- How does fertility affect population growth?
-
----
-
-## 🌿 Git Workflow
-
-Recommended development workflow:
-
-```bash
-git checkout dev
-# make changes
-git add .
-git commit -m "Meaningful commit message"
-git push origin dev
-```
-
-Then create a Pull Request:
-
-```text
-base: main
-compare: dev
-```
-
----
-
-## 🔮 Future Improvements
-
-- Add support for DOCX and TXT files
-- Add OCR support for scanned PDFs
-- Use an LLM for more natural summaries and answers
-- Add highlighted source text
-- Export summary and generated Q&A to PDF
-- Add user authentication
-
----
-
-## 👨‍💻 Author
-
-**Gopikrishna Bojedla**
-
-- GitHub: https://github.com/Gopikrishna1547
+- Works best with text-based PDFs.
+- Scanned image-only PDFs may require OCR before upload.
+- The app does not answer from outside knowledge.

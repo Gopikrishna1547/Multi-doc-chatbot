@@ -5,7 +5,11 @@ import logging
 import streamlit as st
 
 from src.pdf_loader import get_document_stats, load_multiple_pdfs
-from src.qa_engine import ask_question, generate_important_qa, summarize_documents
+from src.qa_engine import (
+    ask_question,
+    generate_important_qa_by_file,
+    summarize_documents_by_file,
+)
 from src.vector_store import build_vector_store, split_text
 
 logging.basicConfig(
@@ -14,6 +18,8 @@ logging.basicConfig(
     handlers=[logging.FileHandler("app.log"), logging.StreamHandler()],
 )
 log = logging.getLogger(__name__)
+
+MAX_UPLOADS = 5
 
 st.set_page_config(page_title="Multi-Document AI Assistant", page_icon="🤖", layout="wide")
 
@@ -25,8 +31,8 @@ def init_session_state():
         "chat_history": [],
         "documents_loaded": False,
         "document_names": [],
-        "document_summary": "",
-        "auto_qa": [],
+        "document_summaries": {},
+        "document_questions": {},
         "document_stats": {"documents": 0, "pages": 0, "words": 0, "chunks": 0},
     }
     for key, value in defaults.items():
@@ -35,7 +41,7 @@ def init_session_state():
 
 
 def count_chunks(documents: dict) -> int:
-    """Count text chunks without building another vector store."""
+    """Count chunks generated from loaded documents."""
     total = 0
     for name, text in documents.items():
         total += len(split_text(text, name))
@@ -46,15 +52,19 @@ def render_sidebar():
     """Render sidebar upload controls and document list."""
     with st.sidebar:
         st.title("📂 Documents")
-        st.markdown("Upload PDFs and ask questions based only on uploaded content.")
+        st.markdown("Upload up to **5 PDFs** and ask questions based only on uploaded content.")
         st.divider()
 
         uploaded_files = st.file_uploader(
             "Upload PDF documents",
             type=["pdf"],
             accept_multiple_files=True,
-            help="Upload one or more text-based PDF files.",
+            help="Upload up to 5 text-based PDF files.",
         )
+
+        if uploaded_files and len(uploaded_files) > MAX_UPLOADS:
+            st.error(f"Maximum {MAX_UPLOADS} PDF files are allowed. Please remove extra files.")
+            return
 
         if uploaded_files and st.button("Process Documents", type="primary"):
             with st.spinner("Reading PDFs and building search index..."):
@@ -68,8 +78,8 @@ def render_sidebar():
                     st.session_state.document_names = list(documents.keys())
                     st.session_state.document_stats = stats
                     st.session_state.chat_history = []
-                    st.session_state.document_summary = summarize_documents(documents)
-                    st.session_state.auto_qa = generate_important_qa(documents)
+                    st.session_state.document_summaries = summarize_documents_by_file(documents)
+                    st.session_state.document_questions = generate_important_qa_by_file(documents)
 
                     st.success(f"Loaded {len(documents)} document(s).")
                 except Exception as error:
@@ -79,8 +89,8 @@ def render_sidebar():
         if st.session_state.documents_loaded:
             st.divider()
             st.markdown("### ✅ Loaded Documents")
-            for name in st.session_state.document_names:
-                st.markdown(f"- {name}")
+            for index, name in enumerate(st.session_state.document_names, start=1):
+                st.markdown(f"{index}. {name}")
 
 
 def render_stats():
@@ -96,12 +106,33 @@ def render_stats():
     col4.metric("Questions", questions_asked)
 
 
+def render_document_sections():
+    """Render per-document summary and per-document generated questions."""
+    st.markdown("## 📄 Summaries by Document")
+    for index, name in enumerate(st.session_state.document_names, start=1):
+        with st.expander(f"{index}. {name} — Summary", expanded=index == 1):
+            bullets = st.session_state.document_summaries.get(name, [])
+            for bullet in bullets:
+                st.markdown(f"- {bullet}")
+
+    st.markdown("## ❓ Important Questions by Document")
+    for index, name in enumerate(st.session_state.document_names, start=1):
+        with st.expander(f"{index}. {name} — Questions", expanded=index == 1):
+            questions = st.session_state.document_questions.get(name, [])
+            if not questions:
+                st.info("No questions could be generated for this document.")
+            for q_index, item in enumerate(questions, start=1):
+                st.markdown(f"**Q{q_index}: {item['question']}**")
+                st.markdown(item["answer"])
+                st.divider()
+
+
 def render_chat():
     """Render the main chat interface."""
     st.title("🤖 Multi-Document AI Assistant")
     st.caption(
-        "Upload PDFs, generate a short summary, review important questions, "
-        "and ask questions answered only from uploaded PDF content."
+        "Upload up to 5 PDFs, view a separate summary and questions for every document, "
+        "and receive page-based answers only from uploaded PDF content."
     )
 
     if not st.session_state.documents_loaded:
@@ -110,11 +141,12 @@ def render_chat():
             """
 ### 🚀 Features
 
-- 📂 Upload multiple PDF documents
-- 📄 Generate a concise 5-10 point summary
-- ❓ Generate important document-specific questions
+- 📂 Upload up to 5 PDF documents
+- 📄 Get a 5-7 line summary for each document
+- ❓ Get important questions for each document
 - 💬 Ask your own questions
-- 🎯 Receive one best answer from the uploaded PDF(s)
+- 📌 See source PDF name and page number
+- 📚 If multiple pages are relevant, see separate page-based answers
 - 🚫 Get a clear fallback message when the answer is not in the PDFs
 """
         )
@@ -122,23 +154,14 @@ def render_chat():
 
     render_stats()
     st.divider()
-
-    if st.session_state.document_summary:
-        st.markdown("## 📄 PDF Summary")
-        st.markdown(st.session_state.document_summary)
-
-    if st.session_state.auto_qa:
-        st.markdown("## ❓ Important Questions and Answers")
-        for index, item in enumerate(st.session_state.auto_qa, start=1):
-            with st.expander(f"Q{index}: {item['question']}"):
-                st.write(item["answer"])
+    render_document_sections()
 
     st.divider()
     st.markdown("## 💬 Ask Your Own Question")
 
     for message in st.session_state.chat_history:
         with st.chat_message(message["role"]):
-            st.write(message["content"])
+            st.markdown(message["content"])
             if message["role"] == "assistant" and message.get("sources"):
                 st.caption(f"Sources: {', '.join(message['sources'])}")
 
@@ -157,7 +180,7 @@ def render_chat():
                     answer = result["answer"]
                     sources = result["sources"]
 
-                    st.write(answer)
+                    st.markdown(answer)
                     if sources:
                         st.caption(f"Sources: {', '.join(sources)}")
 
